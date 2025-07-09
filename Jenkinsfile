@@ -79,3 +79,14 @@ pipeline {
         }
     }
 }
+
+post {
+    always {
+        slackSend (
+            channel: '#all-tech',
+            color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger',
+            message: "Build *${env.JOB_NAME}* #${env.BUILD_NUMBER} finished with status: *${currentBuild.currentResult}*",
+            tokenCredentialId: 'slack-token'
+        )
+    }
+}
