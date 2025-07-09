@@ -26,15 +26,22 @@ pipeline {
             }
         }
 
-        stage("SonarQube Analysis") {
-            steps {
-                withSonarQubeEnv('sonarqube') {
-                    withEnv(["PATH=/opt/sonar-scanner/bin:$PATH"]) {
-                        sh 'sonar-scanner'
-                    }
-                }
+      stage("SonarQube Analysis") {
+    steps {
+        withSonarQubeEnv('sonarqube') {
+            withEnv(["PATH=/opt/sonar-scanner/bin:$PATH"]) {
+                // Extract classes to a temp folder
+                sh '''
+                    mkdir -p extracted_classes
+                    unzip -q target/*.war -d extracted_classes
+                '''
+                // Run sonar with correct binaries path
+                sh 'sonar-scanner -Dsonar.java.binaries=extracted_classes/WEB-INF/classes'
             }
         }
+    }
+}
+
 
         stage("Publish to Nexus") {
             steps {
