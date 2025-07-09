@@ -26,23 +26,19 @@ pipeline {
             }
         }
 
-      stage("SonarQube Analysis") {
-    steps {
-        withSonarQubeEnv('sonarqube') {
-            withEnv(["PATH=/opt/sonar-scanner/bin:$PATH"]) {
-                // Extract classes to a temp folder
-                    sh '''
-    mkdir -p extracted_classes
-    unzip -oq target/*.war -d extracted_classes
-    sonar-scanner -Dsonar.java.binaries=extracted_classes/WEB-INF/classes
-'''
-                // Run sonar with correct binaries path
-                sh 'sonar-scanner -Dsonar.java.binaries=extracted_classes/WEB-INF/classes'
+        stage("SonarQube Analysis") {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    withEnv(["PATH=/opt/sonar-scanner/bin:$PATH"]) {
+                        sh '''
+                            mkdir -p extracted_classes
+                            unzip -oq target/*.war -d extracted_classes
+                            sonar-scanner -Dsonar.java.binaries=extracted_classes/WEB-INF/classes
+                        '''
+                    }
+                }
             }
         }
-    }
-}
-
 
         stage("Publish to Nexus") {
             steps {
@@ -65,29 +61,33 @@ pipeline {
                         repository: NEXUS_REPOSITORY,
                         credentialsId: NEXUS_CREDENTIAL_ID,
                         artifacts: [
-                            [artifactId: pom.artifactId,
-                             classifier: '',
-                             file: artifact,
-                             type: pom.packaging],
-                            [artifactId: pom.artifactId,
-                             classifier: '',
-                             file: 'pom.xml',
-                             type: 'pom']
+                            [
+                                artifactId: pom.artifactId,
+                                classifier: '',
+                                file: artifact,
+                                type: pom.packaging
+                            ],
+                            [
+                                artifactId: pom.artifactId,
+                                classifier: '',
+                                file: 'pom.xml',
+                                type: 'pom'
+                            ]
                         ]
                     )
                 }
             }
         }
     }
-}
 
-post {
-    always {
-        slackSend (
-            channel: '#all-tech',
-            color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger',
-            message: "Build *${env.JOB_NAME}* #${env.BUILD_NUMBER} finished with status: *${currentBuild.currentResult}*",
-            tokenCredentialId: 'slack-token'
-        )
+    post {
+        always {
+            slackSend (
+                channel: '#all-tech',
+                color: currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger',
+                message: "Build *${env.JOB_NAME}* #${env.BUILD_NUMBER} finished with status: *${currentBuild.currentResult}*",
+                tokenCredentialId: 'slack-token'
+            )
+        }
     }
 }
