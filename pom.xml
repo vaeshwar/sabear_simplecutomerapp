@@ -1,25 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
+
    <groupId>com.javatpoint</groupId>
    <artifactId>SimpleCustomerApp</artifactId>
-   <packaging>war</packaging>
    <version>${BUILD_NUMBER}-SNAPSHOT</version>
+   <packaging>war</packaging>
    <name>SimpleCustomerApp</name>
    <url>http://maven.apache.org</url>
+
    <properties>
        <maven.compiler.source>1.8</maven.compiler.source>
        <maven.compiler.target>1.8</maven.compiler.target>
    </properties>
+
    <build>
+      <sourceDirectory>src</sourceDirectory> <!-- your java code lives in src -->
+      <resources>
+         <resource>
+            <directory>src</directory>
+            <includes>
+               <include>**/*.properties</include>
+               <include>**/*.xml</include>
+            </includes>
+         </resource>
+      </resources>
       <plugins>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
             <version>3.3.2</version>
             <configuration>
+               <warSourceDirectory>WebContent</warSourceDirectory> <!-- JSPs/HTML etc -->
                <failOnMissingWebXml>false</failOnMissingWebXml>
             </configuration>
          </plugin>
