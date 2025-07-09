@@ -2,15 +2,14 @@ pipeline {
     agent any
 
     tools {
-        // This must match the tool name configured in Jenkins Global Tool Config
         maven "maven"
+        sonarScanner "sonar_scanner"
     }
 
     environment {
-        // Nexus settings
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
-        NEXUS_URL = "54.85.150.44:8082"  // Note: Don't put trailing slash
+        NEXUS_URL = "54.85.150.44:8082"
         NEXUS_REPOSITORY = "simplecustomerapp"
         NEXUS_CREDENTIAL_ID = "nexus-creds"
     }
@@ -25,6 +24,14 @@ pipeline {
         stage("Maven Build") {
             steps {
                 sh 'mvn -Dmaven.test.failure.ignore=true clean install'
+            }
+        }
+
+        stage("SonarQube Analysis") {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh 'sonar-scanner'
+                }
             }
         }
 
