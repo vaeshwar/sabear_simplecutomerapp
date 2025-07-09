@@ -36,8 +36,6 @@ pipeline {
     unzip -oq target/*.war -d extracted_classes
     sonar-scanner -Dsonar.java.binaries=extracted_classes/WEB-INF/classes
 '''
-
-                '''
                 // Run sonar with correct binaries path
                 sh 'sonar-scanner -Dsonar.java.binaries=extracted_classes/WEB-INF/classes'
             }
