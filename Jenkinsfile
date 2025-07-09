@@ -31,9 +31,12 @@ pipeline {
         withSonarQubeEnv('sonarqube') {
             withEnv(["PATH=/opt/sonar-scanner/bin:$PATH"]) {
                 // Extract classes to a temp folder
-                sh '''
-                    mkdir -p extracted_classes
-                    unzip -q target/*.war -d extracted_classes
+                    sh '''
+    mkdir -p extracted_classes
+    unzip -oq target/*.war -d extracted_classes
+    sonar-scanner -Dsonar.java.binaries=extracted_classes/WEB-INF/classes
+'''
+
                 '''
                 // Run sonar with correct binaries path
                 sh 'sonar-scanner -Dsonar.java.binaries=extracted_classes/WEB-INF/classes'
