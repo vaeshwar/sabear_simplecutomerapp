@@ -3,7 +3,6 @@ pipeline {
 
     tools {
         maven "maven"
-        sonarScanner 'sonar_scanner'
     }
 
     environment {
@@ -30,7 +29,9 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    sh 'sonar-scanner'
+                    withEnv(["PATH=/opt/sonar-scanner/bin:$PATH"]) {
+                        sh 'sonar-scanner'
+                    }
                 }
             }
         }
